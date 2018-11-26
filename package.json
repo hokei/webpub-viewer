@@ -26,17 +26,18 @@
     "clean": "rimraf node_modules lib dist",
     "prepublishOnly": "npm run test",
     "about": "echo 'Do not update @types/parse5 to version 5 or else it will break jsdom typings!'",
-    "build:streamed": "npm run prepublish && npm run copy:all",
+    "build:streamed-old": "npm run prepublish && npm run copy:all",
     "copy:all-old": "npm run copy:readium-css && npm run copy:r2-navigator && npm run copy:r2-glue-js && npm run copy:streamed",
     "copy:readium-css": "cp -r ./node_modules/readium-css/css/dist examples/streamed/readers/reader-JBKS/readium-css",
     "copy:r2-glue-js": "cp ./node_modules/r2-glue-js/dist/ReadiumGlue.js examples/streamed/readers/reader-JBKS/r2-glue-js.js",
     "copy:r2-navigator-old": "mkdir -p examples/streamed/readers/reader-JBKS/@readium && cp ./node_modules/@readium/navigator-web/dist/readium-navigator-web.umd.js examples/streamed/readers/reader-JBKS/@readium/navigator-web.js",
-    "copy:streamed": "cpx 'viewer/*.{html,css,js}' examples/streamed/readers/reader-JBKS",
+    "copy:streamed-old": "cpx 'viewer/*.{html,css,js}' examples/streamed/readers/reader-JBKS",
     "eb-start": "npm run prepare && npm run examples && npm run streamed",
     "build:examples": "npm run prepublish && npm run examples && npm run copy:all",
+    "build:streamed": "npm run prepublish && npm run copy:streamed",
     "copy:all": "npm run copy:r2-navigator && npm run copy:readium-cfi",
-    "copy:r2-navigator": "cp ./node_modules/@evidentpoint/r2-navigator-web/dist/r2-navigator-web.umd.js examples/streamed/readers/reader-JBKS/@evidentpoint/r2-navigator-web.js",
-    "copy:readium-cfi": "cp ./node_modules/readium-cfi-js/dist/readium-cfi.umd.js examples/streamed/readers/reader-JBKS/readium-cfi-js.js"
+    "copy:r2-navigator": "cp ./node_modules/@readium/navigator-web/dist/readium-navigator-web.umd.js examples/streamed/readers/reader-JBKS/@readium/navigator-web.js",
+    "copy:streamed": "cpx 'viewer/*.{html,css,js}' examples/streamed/readers/reader-JBKS"
   },
   "dependencies": {
     "cpx": "^1.5.0",
@@ -46,7 +47,7 @@
     "typescript": "^3.6.3",
     "url-polyfill": "^1.0.13",
     "whatwg-fetch": "^2.0.4",
-    "@evidentpoint/r2-navigator-web": "^0.0.3"
+    "@readium/navigator-web": "^1.0.0-alpha.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
