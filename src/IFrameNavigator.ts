@@ -23,7 +23,7 @@ import EventHandler from "./EventHandler";
 import * as BrowserUtilities from "./BrowserUtilities";
 import * as HTMLUtilities from "./HTMLUtilities";
 import * as IconLib from "./IconLib";
-import { R2NavigatorView } from "./R2NavigatorView";
+// import { R2NavigatorView } from "./R2NavigatorView";
 // @ts-ignore
 import { SimpleNavigatorView, ChapterInfo } from "./SimpleNavigatorView";
 
@@ -219,7 +219,7 @@ export default class IFrameNavigator implements Navigator {
     private isLoading: boolean;
     private canFullscreen: boolean = (document as any).fullscreenEnabled || (document as any).webkitFullscreenEnabled || (document as any).mozFullScreenEnabled || (document as any).msFullscreenEnabled;
     private iframeRoot: HTMLElement;
-    private navView: R2NavigatorView | SimpleNavigatorView;
+    private navView: SimpleNavigatorView;
 
     public static async create(config: IFrameNavigatorConfig) {
         const navigator = new this(
@@ -261,17 +261,17 @@ export default class IFrameNavigator implements Navigator {
             this.navView.destroy();
         }
 
-        const shouldScroll = this.settings.getSelectedView() === this.scroller;
-        this.navView = new R2NavigatorView({
-            viewAsVertical: shouldScroll,
-            enableScroll: shouldScroll,
-        });
-        // this.navView = new SimpleNavigatorView({
-        //     paginator: <PaginatedBookView> this.paginator,
-        //     settings: this.settings,
-        //     manifestUrl: this.manifestUrl,
-        //     store: this.store,
+        // const shouldScroll = this.settings.getSelectedView() === this.scroller;
+        // this.navView = new R2NavigatorView({
+        //     viewAsVertical: shouldScroll,
+        //     enableScroll: shouldScroll,
         // });
+        this.navView = new SimpleNavigatorView({
+            paginator: <PaginatedBookView> this.paginator,
+            settings: this.settings,
+            manifestUrl: this.manifestUrl,
+            store: this.store,
+        });
 
 
         await this.navView.loadPublication(this.manifestUrl.href, this.iframeRoot);

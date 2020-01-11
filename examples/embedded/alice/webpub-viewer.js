@@ -177,13 +177,12 @@ define("BookSettings", ["require", "exports", "HTMLUtilities", "IconLib"], funct
         }
         BookSettings.create = function (config) {
             return __awaiter(this, void 0, void 0, function () {
-                var fontSizes, settings;
+                var settings;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            fontSizes = config.fontSizesInPixels.map(function (fontSize) { return fontSize + "px"; });
-                            settings = new this(config.store, config.bookFonts, fontSizes, config.bookThemes, config.bookViews);
-                            return [4 /*yield*/, settings.initializeSelections(config.defaultFontSizeInPixels ? config.defaultFontSizeInPixels + "px" : undefined)];
+                            settings = new this(config.store, config.bookFonts, config.fontSizes, config.bookThemes, config.bookViews);
+                            return [4 /*yield*/, settings.initializeSelections(config.defaultFontSize ? config.defaultFontSize : undefined)];
                         case 1:
                             _a.sent();
                             return [2 /*return*/, settings];
@@ -353,12 +352,12 @@ define("BookSettings", ["require", "exports", "HTMLUtilities", "IconLib"], funct
                 var button = this_1.fontButtons[font.name];
                 if (button) {
                     button.addEventListener("click", function (event) {
-                        _this.selectedFont.stop();
-                        font.start();
+                        // this.selectedFont.stop();
+                        // font.start();
                         _this.selectedFont = font;
                         _this.updateFontButtons();
                         _this.storeSelectedFont(font);
-                        _this.fontChangeCallback();
+                        _this.fontChangeCallback(font.name);
                         event.preventDefault();
                     });
                 }
@@ -374,7 +373,7 @@ define("BookSettings", ["require", "exports", "HTMLUtilities", "IconLib"], funct
                     if (currentFontSizeIndex > 0) {
                         var newFontSize = _this.fontSizes[currentFontSizeIndex - 1];
                         _this.selectedFontSize = newFontSize;
-                        _this.fontSizeChangeCallback();
+                        _this.fontSizeChangeCallback(newFontSize);
                         _this.updateFontSizeButtons();
                         _this.storeSelectedFontSize(newFontSize);
                     }
@@ -385,7 +384,7 @@ define("BookSettings", ["require", "exports", "HTMLUtilities", "IconLib"], funct
                     if (currentFontSizeIndex < _this.fontSizes.length - 1) {
                         var newFontSize = _this.fontSizes[currentFontSizeIndex + 1];
                         _this.selectedFontSize = newFontSize;
-                        _this.fontSizeChangeCallback();
+                        _this.fontSizeChangeCallback(newFontSize);
                         _this.updateFontSizeButtons();
                         _this.storeSelectedFontSize(newFontSize);
                     }
@@ -401,7 +400,7 @@ define("BookSettings", ["require", "exports", "HTMLUtilities", "IconLib"], funct
                         _this.selectedTheme = theme;
                         _this.updateThemeButtons();
                         _this.storeSelectedTheme(theme);
-                        _this.themeChangeCallback();
+                        _this.themeChangeCallback(theme.name);
                         event.preventDefault();
                     });
                 }
@@ -591,40 +590,41 @@ define("ColumnsPaginatedBookView", ["require", "exports", "HTMLUtilities", "Brow
             this.height = 0;
             this.hasFixedScrollWidth = false;
         }
+        // @ts-ignore
         ColumnsPaginatedBookView.prototype.start = function (position) {
             // any is necessary because CSSStyleDeclaration type does not include
             // all the vendor-prefixed attributes.
-            var body = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "body");
-            body.style.webkitColumnCount = "1";
-            body.style.MozColumnCount = "1";
-            body.style.columnCount = "1";
-            body.style.webkitColumnFill = "auto";
-            body.style.MozColumnFill = "auto";
-            body.style.columnFill = "auto";
-            body.style.overflow = "hidden";
-            body.style.position = "relative";
-            body.style.webkitFontSmoothing = "subpixel-antialiased";
-            this.setSize();
-            var viewportElement = document.createElement("meta");
-            viewportElement.name = "viewport";
-            viewportElement.content = "width=device-width, initial-scale=1, maximum-scale=1";
-            var head = HTMLUtilities.findIframeElement(this.bookElement.contentDocument, "head");
-            if (head) {
-                head.appendChild(viewportElement);
-            }
-            this.checkForFixedScrollWidth();
-            this.goToPosition(position);
+            // const body = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "body") as any;
+            // body.style.webkitColumnCount = "1";
+            // body.style.MozColumnCount = "1";
+            // body.style.columnCount = "1";
+            // body.style.webkitColumnFill = "auto";
+            // body.style.MozColumnFill = "auto";
+            // body.style.columnFill = "auto";
+            // body.style.overflow = "hidden";
+            // body.style.position = "relative";
+            // body.style.webkitFontSmoothing = "subpixel-antialiased";
+            // this.setSize();
+            // const viewportElement = document.createElement("meta");
+            // viewportElement.name = "viewport";
+            // viewportElement.content = "width=device-width, initial-scale=1, maximum-scale=1";
+            // const head = HTMLUtilities.findIframeElement(this.bookElement.contentDocument, "head");
+            // if (head) {
+            //     head.appendChild(viewportElement);
+            // }
+            // this.checkForFixedScrollWidth();
+            // this.goToPosition(position);
             // This is delayed to prevent a bug in iOS 10.3 that causes
             // the top links to be displayed in the middle of the page.
-            setTimeout(function () {
-                document.body.style.overflow = "hidden";
-                // This prevents overscroll/bouncing on iOS.
-                document.body.style.position = "fixed";
-                document.body.style.left = "0";
-                document.body.style.right = "0";
-                document.body.style.top = "0";
-                document.body.style.bottom = "0";
-            }, 0);
+            // setTimeout(() => {
+            //     document.body.style.overflow = "hidden";
+            //     // This prevents overscroll/bouncing on iOS.
+            //     document.body.style.position = "fixed";
+            //     document.body.style.left = "0";
+            //     document.body.style.right = "0";
+            //     document.body.style.top = "0";
+            //     document.body.style.bottom = "0";
+            // }, 0);
         };
         ColumnsPaginatedBookView.prototype.checkForFixedScrollWidth = function () {
             // Determine if the scroll width changes when the left position
@@ -637,6 +637,7 @@ define("ColumnsPaginatedBookView", ["require", "exports", "HTMLUtilities", "Brow
             this.hasFixedScrollWidth = (body.scrollWidth === originalScrollWidth);
             body.style.left = originalLeft + "px";
         };
+        // @ts-ignore
         ColumnsPaginatedBookView.prototype.setSize = function () {
             // any is necessary because CSSStyleDeclaration type does not include
             // all the vendor-prefixed attributes.
@@ -687,40 +688,39 @@ define("ColumnsPaginatedBookView", ["require", "exports", "HTMLUtilities", "Brow
             document.body.style.right = "";
             document.body.style.top = "";
             document.body.style.bottom = "";
-            var body = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "body");
-            body.style.columnCount = "";
-            body.style.webkitColumnCount = "";
-            body.style.MozColumnCount = "";
-            body.style.columnGap = "";
-            body.style.webkitColumnGap = "";
-            body.style.MozColumnGap = "";
-            body.style.columnFill = "";
-            body.style.webkitColumnFill = "";
-            body.style.MozColumnFill = "";
-            body.style.overflow = "";
-            body.style.position = "";
-            body.style.webkitFontSmoothing = "";
-            body.style.columnWidth = "";
-            body.style.webkitColumnWidth = "";
-            body.style.MozColumnWidth = "";
-            body.style.height = "";
-            body.style.width = "";
-            body.style.marginLeft = "";
-            body.style.marginRight = "";
-            body.style.marginTop = "";
-            body.style.marginBottom = "";
-            this.bookElement.contentDocument.documentElement.style.height = "";
-            this.bookElement.style.height = "";
-            this.bookElement.style.width = "";
-            var images = body.querySelectorAll("img");
-            for (var _i = 0, images_2 = images; _i < images_2.length; _i++) {
-                var image = images_2[_i];
-                image.style.maxWidth = "";
-                image.style.maxHeight = "";
-                image.style.display = "";
-                image.style.marginLeft = "";
-                image.style.marginRight = "";
-            }
+            // const body = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "body") as any;
+            // body.style.columnCount = "";
+            // body.style.webkitColumnCount = "";
+            // body.style.MozColumnCount = "";
+            // body.style.columnGap = "";
+            // body.style.webkitColumnGap = "";
+            // body.style.MozColumnGap = "";
+            // body.style.columnFill = "";
+            // body.style.webkitColumnFill = "";
+            // body.style.MozColumnFill = "";
+            // body.style.overflow = "";
+            // body.style.position = "";
+            // body.style.webkitFontSmoothing = "";
+            // body.style.columnWidth = "";
+            // body.style.webkitColumnWidth = "";
+            // body.style.MozColumnWidth = "";
+            // body.style.height = "";
+            // body.style.width = "";
+            // body.style.marginLeft = "";
+            // body.style.marginRight = "";
+            // body.style.marginTop = "";
+            // body.style.marginBottom = "";
+            // (this.bookElement.contentDocument as any).documentElement.style.height = "";
+            // this.bookElement.style.height = "";
+            // this.bookElement.style.width = "";
+            // const images = body.querySelectorAll("img");
+            // for (const image of images) {
+            //     image.style.maxWidth = "";
+            //     image.style.maxHeight = "";
+            //     image.style.display = "";
+            //     image.style.marginLeft = "";
+            //     image.style.marginRight = "";
+            // }
         };
         /** Returns the total width of the columns that are currently
             positioned to the left of the iframe viewport. */
@@ -784,11 +784,11 @@ define("ColumnsPaginatedBookView", ["require", "exports", "HTMLUtilities", "Brow
             proportion of columns that are currently positioned
             to the left of the iframe viewport. */
         ColumnsPaginatedBookView.prototype.getCurrentPosition = function () {
-            var width = this.getColumnWidth();
-            var leftWidth = this.getLeftColumnsWidth();
-            var rightWidth = this.getRightColumnsWidth();
-            var totalWidth = leftWidth + width + rightWidth;
-            return leftWidth / totalWidth;
+            // const width = this.getColumnWidth();
+            // const leftWidth = this.getLeftColumnsWidth();
+            // const rightWidth = this.getRightColumnsWidth();
+            // const totalWidth = leftWidth + width + rightWidth;
+            return 0; //leftWidth / totalWidth;
         };
         /** Returns the current 1-indexed page number. */
         ColumnsPaginatedBookView.prototype.getCurrentPage = function () {
@@ -825,23 +825,24 @@ define("ColumnsPaginatedBookView", ["require", "exports", "HTMLUtilities", "Brow
             or 1 to go to the last page. The position will be rounded down so
             it matches the position of one of the columns. */
         /** @param position Number in range [0..1] */
+        // @ts-ignore
         ColumnsPaginatedBookView.prototype.goToPosition = function (position) {
-            this.setSize();
+            // this.setSize();
             // If the window has changed size since the columns were set up,
             // we need to reset position so we can determine the new total width.
-            this.setLeftColumnsWidth(0);
-            var width = this.getColumnWidth();
-            var rightWidth = this.getRightColumnsWidth();
-            var totalWidth = width + rightWidth;
-            var newLeftWidth = position * totalWidth;
+            // this.setLeftColumnsWidth(0);
+            // const width = this.getColumnWidth();
+            // const rightWidth = this.getRightColumnsWidth();
+            // const totalWidth = width + rightWidth;
+            // const newLeftWidth = position * totalWidth;
             // Round the new left width so it's a multiple of the column width.
-            var roundedLeftWidth = Math.round(newLeftWidth / width) * width;
-            if (roundedLeftWidth >= totalWidth) {
-                // We've gone too far and all the columns are off to the left.
-                // Move one column back into the viewport.
-                roundedLeftWidth = roundedLeftWidth - width;
-            }
-            this.setLeftColumnsWidth(roundedLeftWidth);
+            // let roundedLeftWidth = Math.round(newLeftWidth / width) * width;
+            // if (roundedLeftWidth >= totalWidth) {
+            // We've gone too far and all the columns are off to the left.
+            // Move one column back into the viewport.
+            // roundedLeftWidth = roundedLeftWidth - width;
+            // }
+            // this.setLeftColumnsWidth(roundedLeftWidth);
         };
         ColumnsPaginatedBookView.prototype.goToElement = function (elementId, relative) {
             var element = this.bookElement.contentDocument.getElementById(elementId);
@@ -1243,15 +1244,15 @@ define("SepiaTheme", ["require", "exports", "HTMLUtilities"], function (require,
         }
         SepiaTheme.prototype.start = function () {
             var rootElement = document.documentElement;
-            var rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html");
+            // const rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html") as HTMLHtmlElement;
             HTMLUtilities.setAttr(rootElement, "data-viewer-theme", "sepia");
-            HTMLUtilities.createStylesheet(rootFrame, "sepia-mode-internal", ":root {background-color: #f6ecd9 !important}  img, svg {background-color: transparent !important; mix-blend-mode: multiply;}");
+            // HTMLUtilities.createStylesheet(rootFrame, "sepia-mode-internal", ":root {background-color: #f6ecd9 !important}  img, svg {background-color: transparent !important; mix-blend-mode: multiply;}");
         };
         SepiaTheme.prototype.stop = function () {
             var rootElement = document.documentElement;
-            var rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html");
+            // const rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html") as HTMLHtmlElement;
             HTMLUtilities.removeAttr(rootElement, "data-viewer-theme");
-            HTMLUtilities.removeStylesheet(rootFrame, "sepia-mode-internal");
+            // HTMLUtilities.removeStylesheet(rootFrame, "sepia-mode-internal");
         };
         return SepiaTheme;
     }());
@@ -1267,15 +1268,15 @@ define("NightTheme", ["require", "exports", "HTMLUtilities"], function (require,
         }
         NightTheme.prototype.start = function () {
             var rootElement = document.documentElement;
-            var rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html");
+            // const rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html") as HTMLHtmlElement;
             HTMLUtilities.setAttr(rootElement, "data-viewer-theme", "night");
-            HTMLUtilities.createStylesheet(rootFrame, "night-mode-internal", ":root {background-color: #111 !important; color: #FFFFFF !important} :not(a) {background-color: transparent !important; color: #FFFFFF !important; border-color: currentColor !important;} a {color: #53CEEA !important;}");
+            // HTMLUtilities.createStylesheet(rootFrame, "night-mode-internal", ":root {background-color: #111 !important; color: #FFFFFF !important} :not(a) {background-color: transparent !important; color: #FFFFFF !important; border-color: currentColor !important;} a {color: #53CEEA !important;}");
         };
         NightTheme.prototype.stop = function () {
             var rootElement = document.documentElement;
-            var rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html");
+            // const rootFrame = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "html") as HTMLHtmlElement;
             HTMLUtilities.removeAttr(rootElement, "data-viewer-theme");
-            HTMLUtilities.removeStylesheet(rootFrame, "night-mode-internal");
+            // HTMLUtilities.removeStylesheet(rootFrame, "night-mode-internal");
         };
         return NightTheme;
     }());
@@ -1291,6 +1292,7 @@ define("ScrollingBookView", ["require", "exports", "BrowserUtilities", "HTMLUtil
             this.sideMargin = 0;
             this.height = 0;
         }
+        // @ts-ignore
         ScrollingBookView.prototype.setIFrameSize = function () {
             // Remove previous iframe height so body scroll height will be accurate.
             this.bookElement.style.height = "";
@@ -1304,8 +1306,8 @@ define("ScrollingBookView", ["require", "exports", "BrowserUtilities", "HTMLUtil
             var bodyHeight = body.scrollHeight;
             this.bookElement.style.height = Math.max(minHeight, bodyHeight) + "px";
             var images = Array.prototype.slice.call(body.querySelectorAll("img"));
-            for (var _i = 0, images_3 = images; _i < images_3.length; _i++) {
-                var image = images_3[_i];
+            for (var _i = 0, images_2 = images; _i < images_2.length; _i++) {
+                var image = images_2[_i];
                 image.style.maxWidth = width;
             }
         };
@@ -1315,15 +1317,14 @@ define("ScrollingBookView", ["require", "exports", "BrowserUtilities", "HTMLUtil
         ScrollingBookView.prototype.stop = function () {
             this.bookElement.style.height = "";
             this.bookElement.style.width = "";
-            var body = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "body");
-            body.style.width = "";
-            body.style.marginLeft = "";
-            body.style.marginRight = "";
-            var images = Array.prototype.slice.call(body.querySelectorAll("img"));
-            for (var _i = 0, images_4 = images; _i < images_4.length; _i++) {
-                var image = images_4[_i];
-                image.style.maxWidth = "";
-            }
+            // const body = HTMLUtilities.findRequiredIframeElement(this.bookElement.contentDocument, "body") as HTMLBodyElement;
+            // body.style.width = "";
+            // body.style.marginLeft = "";
+            // body.style.marginRight = "";
+            // const images = Array.prototype.slice.call(body.querySelectorAll("img"));
+            // for (const image of images) {
+            //     image.style.maxWidth = "";
+            // }
         };
         ScrollingBookView.prototype.getCurrentPosition = function () {
             return document.body.scrollTop / document.body.scrollHeight;
@@ -1332,7 +1333,7 @@ define("ScrollingBookView", ["require", "exports", "BrowserUtilities", "HTMLUtil
             return (document.body.scrollHeight - document.body.scrollTop) === BrowserUtilities.getHeight();
         };
         ScrollingBookView.prototype.goToPosition = function (position) {
-            this.setIFrameSize();
+            // this.setIFrameSize();
             document.body.scrollTop = document.body.scrollHeight * position;
         };
         ScrollingBookView.prototype.goToElement = function (elementId) {
@@ -1488,16 +1489,146 @@ define("Manifest", ["require", "exports"], function (require, exports) {
     }());
     exports.default = Manifest;
 });
-define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHandler", "BrowserUtilities", "HTMLUtilities", "IconLib"], function (require, exports, Cacher_1, Manifest_1, EventHandler_1, BrowserUtilities, HTMLUtilities, IconLib) {
+define("SimpleNavigatorView", ["require", "exports", "Manifest"], function (require, exports, Manifest_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var epubReadingSystemObject = {
-        name: "Webpub viewer",
-        version: "0.1.0"
-    };
-    var epubReadingSystem = Object.freeze(epubReadingSystemObject);
+    var SimpleNavigatorView = /** @class */ (function () {
+        // @ts-ignore
+        function SimpleNavigatorView(settings) {
+            this.bindOwnMethods();
+            this.paginator = settings.paginator;
+            this.settings = settings.settings;
+            this.manifestUrl = settings.manifestUrl;
+            this.store = settings.store;
+        }
+        // @ts-ignore
+        SimpleNavigatorView.prototype.addLocationChangedListener = function (callback) {
+        };
+        SimpleNavigatorView.prototype.getChapterInfo = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var chapterInfo;
+                return __generator(this, function (_a) {
+                    chapterInfo = {
+                        title: '',
+                        href: '',
+                    };
+                    return [2 /*return*/, chapterInfo];
+                });
+            });
+        };
+        // @ts-ignore
+        SimpleNavigatorView.prototype.updateFont = function (font) {
+        };
+        // @ts-ignore
+        SimpleNavigatorView.prototype.updateFontSize = function (newFontSize) {
+        };
+        // @ts-ignore
+        SimpleNavigatorView.prototype.updateTheme = function (theme) {
+        };
+        SimpleNavigatorView.prototype.nextScreen = function () {
+        };
+        SimpleNavigatorView.prototype.previousScreen = function () {
+        };
+        // @ts-ignore
+        SimpleNavigatorView.prototype.goToHrefLocation = function (href) {
+        };
+        SimpleNavigatorView.prototype.destroy = function () {
+            this.iframe.remove();
+        };
+        // @ts-ignore
+        SimpleNavigatorView.prototype.loadPublication = function (pubUrl, root) {
+            return __awaiter(this, void 0, void 0, function () {
+                var _a, startLink, startUrl, width, height;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this;
+                            return [4 /*yield*/, Manifest_1.default.getManifest(this.manifestUrl, this.store)];
+                        case 1:
+                            _a.manifest = _b.sent();
+                            startLink = this.manifest.getStartLink();
+                            startUrl = '';
+                            if (startLink && startLink.href) {
+                                startUrl = new URL(startLink.href, this.manifestUrl.href).href;
+                            }
+                            width = this.getAvailableWidth();
+                            height = this.getAvailableHeight();
+                            this.iframe = this.createIFrame(startUrl);
+                            this.iframe.width = width + 'px';
+                            this.iframe.height = height + 'px';
+                            this.paginator.bookElement = this.iframe;
+                            this.paginator.height = height;
+                            this.paginator.sideMargin = 40;
+                            // @ts-ignore
+                            window.paginator = this.paginator;
+                            root.appendChild(this.iframe);
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        SimpleNavigatorView.prototype.bindOwnMethods = function () {
+            this.updateFont = this.updateFont.bind(this);
+            this.updateFontSize = this.updateFontSize.bind(this);
+            this.updateTheme = this.updateTheme.bind(this);
+        };
+        SimpleNavigatorView.prototype.createIFrame = function (src) {
+            var iframe = document.createElement('iframe');
+            iframe.setAttribute('allowtransparency', 'true');
+            iframe.src = src;
+            return iframe;
+        };
+        // Get available height for iframe container to sit within
+        SimpleNavigatorView.prototype.getAvailableHeight = function () {
+            var topBar = document.getElementById('top-control-bar');
+            var topHeight = 0;
+            if (topBar) {
+                var topRect = topBar.getBoundingClientRect();
+                topHeight = topRect.height;
+            }
+            var bottomBar = document.getElementById('bottom-control-bar');
+            var bottomBar2 = document.getElementById('bottom-info-bar');
+            var bottomHeight = 0;
+            if (bottomBar) {
+                var bottomRect = bottomBar.getBoundingClientRect();
+                bottomHeight = bottomRect.height;
+                if (bottomHeight <= 5 && bottomBar2) {
+                    var bottomRect2 = bottomBar2.getBoundingClientRect();
+                    bottomHeight = bottomRect2.height;
+                }
+            }
+            return window.innerHeight - topHeight - bottomHeight;
+        };
+        // Get available width for iframe container to sit within
+        SimpleNavigatorView.prototype.getAvailableWidth = function () {
+            var prevBtn = document.getElementById('prev-page-btn');
+            var prevBtnWidth = 0;
+            if (prevBtn) {
+                var rect = prevBtn.getBoundingClientRect();
+                prevBtnWidth = rect.width;
+            }
+            var nextBtn = document.getElementById('next-page-btn');
+            var nextBtnWidth = 0;
+            if (nextBtn) {
+                var rect = nextBtn.getBoundingClientRect();
+                nextBtnWidth = rect.width;
+            }
+            return window.innerWidth - prevBtnWidth - nextBtnWidth;
+        };
+        return SimpleNavigatorView;
+    }());
+    exports.SimpleNavigatorView = SimpleNavigatorView;
+});
+define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHandler", "BrowserUtilities", "HTMLUtilities", "IconLib", "SimpleNavigatorView"], function (require, exports, Cacher_1, Manifest_2, EventHandler_1, BrowserUtilities, HTMLUtilities, IconLib, SimpleNavigatorView_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    // const epubReadingSystemObject: EpubReadingSystemObject = {
+    //     name: "Webpub viewer",
+    //     version: "0.1.0"
+    // };
+    // const epubReadingSystem = Object.freeze(epubReadingSystemObject);
     var upLinkTemplate = function (label, ariaLabel) { return "\n  <a rel=\"up\" aria-label=\"" + ariaLabel + "\">\n    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + IconLib.WIDTH_ATTR + "\" height=\"" + IconLib.HEIGHT_ATTR + "\" viewBox=\"" + IconLib.VIEWBOX_ATTR + "\" aria-labelledby=\"up-label\" preserveAspectRatio=\"xMidYMid meet\" role=\"img\" class=\"icon\">\n      <title id=\"up-label\">" + label + "</title>\n      " + IconLib.icons.home + "\n    </svg>\n    <span class=\"setting-text up\">" + label + "</span>\n  </a>\n"; };
-    var template = "\n  <nav class=\"publication\">\n    <div class=\"controls-trigger\">\n      <button class=\"trigger\" aria-haspopup=\"true\" aria-expanded=\"true\">\n        " + IconLib.icons.menu + "\n      </button>\n    </div>\n    <div class=\"controls\">\n        " + IconLib.icons.closeOriginal + "\n        " + IconLib.icons.checkOriginal + "\n      <a href=\"#settings-control\" class=\"scrolling-suggestion\" style=\"display: none\">\n          We recommend scrolling mode for use with screen readers and keyboard navigation.\n          Go to settings to switch to scrolling mode.\n      </a>\n      <ul class=\"links top active\">\n        <li>\n          <button class=\"contents disabled\" aria-labelledby=\"contents-label\" aria-haspopup=\"true\" aria-expanded=\"false\">\n            " + IconLib.icons.toc + "\n            " + IconLib.icons.closeDupe + "\n            <span class=\"setting-text contents\" id=\"contents-label\">Contents</span>\n          </button>\n          <div class=\"contents-view controls-view inactive\" aria-hidden=\"true\"></div>\n        </li>\n        <li>\n          <button id=\"settings-control\" class=\"settings\" aria-labelledby=\"settings-label\" aria-expanded=\"false\" aria-haspopup=\"true\">\n            " + IconLib.icons.settings + "\n            " + IconLib.icons.closeDupe + "\n            <span class=\"setting-text settings\" id=\"settings-label\">Settings</span>\n          </button>\n          <div class=\"settings-view controls-view inactive\" aria-hidden=\"true\"></div>\n        </li>\n      </ul>\n    </div>\n    <!-- /controls -->\n  </nav>\n  <main style=\"overflow: hidden\" tabindex=-1>\n    <div class=\"loading\" style=\"display:none;\">\n      " + IconLib.icons.loading + "\n    </div>\n    <div class=\"error\" style=\"display:none;\">\n      <span>\n        " + IconLib.icons.error + "\n      </span>\n      <span>There was an error loading this page.</span>\n      <button class=\"go-back\">Go back</button>\n      <button class=\"try-again\">Try again</button>\n    </div>\n    <div class=\"info top\">\n      <span class=\"book-title\"></span>\n    </div>\n    <iframe allowtransparency=\"true\" title=\"book text\" style=\"border:0; overflow: hidden;\"></iframe>\n    <div class=\"info bottom\">\n      <span class=\"chapter-position\"></span>\n      <span class=\"chapter-title\"></span>\n    </div>\n  </main>\n  <nav class=\"publication\">\n    <div class=\"controls\">\n      <ul class=\"links bottom active\">\n        <li>\n          <a rel=\"prev\" class=\"disabled\" role=\"button\" aria-labelledby=\"previous-label\">\n          " + IconLib.icons.previous + "\n          <span class=\"chapter-control\" id=\"previous-label\">Previous Chapter</span>\n          </a>\n        </li>\n        <li aria-label=\"chapters\">Chapters</li>\n        <li>\n          <a rel=\"next\" class=\"disabled\" role=\"button\" aria-labelledby=\"next-label\">\n            <span class=\"chapter-control\" id =\"next-label\">Next Chapter</span>\n            " + IconLib.icons.next + "\n          </a>\n        </li>\n      </ul>\n    </div>\n    <!-- /controls -->\n  </nav>\n";
+    var template = "\n    <main style=\"overflow: hidden\" tabindex=-1>\n        <div class=\"loading\" style=\"display:none;\">\n            " + IconLib.icons.loading + "\n        </div>\n        <div class=\"error\" style=\"display:none;\">\n            <span>\n            " + IconLib.icons.error + "\n            </span>\n            <span>There was an error loading this page.</span>\n            <button class=\"go-back\">Go back</button>\n            <button class=\"try-again\">Try again</button>\n        </div>\n        <div id=\"top-control-bar\" class=\"info top\">  \n            <span class=\"book-title\"></span>\n        </div>\n        <div class=\"page-container\">\n            <div id=\"prev-page-btn\" class=\"flip-page-container\">\n                <button class=\"flip-page-btn prev\">\n                    <svg viewBox=\"0 0 24 24\" role=\"img\" width=\"24\" height=\"24\"\n                    aria-labelledby=\"next-page-btn-title\" class=\"flip-page-icon prev\">\n                        <title id=\"next-page-btn-title\">Switch to next page</title>\n                        <path d=\"M16.59 8.59 L12 13.17 7.41 8.59 6 10 l6 6 6-6-1.41-1.41z\"/>\n                    </svg>\n                </button>\n            </div>\n            <div id=\"iframe-container\"></div>\n            <div id=\"next-page-btn\" class=\"flip-page-container\">\n                <button class=\"flip-page-btn next\">\n                    <svg viewBox=\"0 0 24 24\" role=\"img\" width=\"24\" height=\"24\"\n                        aria-labelledby=\"next-page-btn-title\" class=\"flip-page-icon next\">\n                        <title id=\"next-page-btn-title\">Switch to next page</title>\n                        <path d=\"M16.59 8.59 L12 13.17 7.41 8.59 6 10 l6 6 6-6-1.41-1.41z\"/>\n                    </svg>\n                </button>\n            </div>\n        </div>\n        <div id=\"bottom-info-bar\" class=\"info bottom\">\n            <span class=\"chapter-position\"></span>\n            <span class=\"chapter-title\"></span>\n        </div>\n    </main>\n    <nav class=\"publication\">\n    <div class=\"controls-trigger\">\n      <button class=\"trigger\" aria-haspopup=\"true\" aria-expanded=\"true\">\n        " + IconLib.icons.menu + "\n      </button>\n    </div>\n    <div class=\"controls\">\n        " + IconLib.icons.closeOriginal + "\n        " + IconLib.icons.checkOriginal + "\n      <a href=\"#settings-control\" class=\"scrolling-suggestion\" style=\"display: none\">\n          We recommend scrolling mode for use with screen readers and keyboard navigation.\n          Go to settings to switch to scrolling mode.\n      </a>\n      <ul class=\"links top active\">\n        <li>\n          <button class=\"contents disabled\" aria-labelledby=\"contents-label\" aria-haspopup=\"true\" aria-expanded=\"false\">\n            " + IconLib.icons.toc + "\n            " + IconLib.icons.closeDupe + "\n            <span class=\"setting-text contents\" id=\"contents-label\">Contents</span>\n          </button>\n          <div class=\"contents-view controls-view inactive\" aria-hidden=\"true\"></div>\n        </li>\n        <li>\n          <button id=\"settings-control\" class=\"settings\" aria-labelledby=\"settings-label\" aria-expanded=\"false\" aria-haspopup=\"true\">\n            " + IconLib.icons.settings + "\n            " + IconLib.icons.closeDupe + "\n            <span class=\"setting-text settings\" id=\"settings-label\">Settings</span>\n          </button>\n          <div class=\"settings-view controls-view inactive\" aria-hidden=\"true\"></div>\n        </li>\n      </ul>\n    </div>\n    <!-- /controls -->\n  </nav>\n  <nav class=\"publication\">\n    <div class=\"controls\">\n      <ul id=\"bottom-control-bar\" class=\"links bottom active\">\n        <li>\n          <a rel=\"prev\" class=\"disabled\" role=\"button\" aria-labelledby=\"previous-label\">\n          " + IconLib.icons.previous + "\n          <span class=\"chapter-control\" id=\"previous-label\">Previous Chapter</span>\n          </a>\n        </li>\n        <li aria-label=\"chapters\">Chapters</li>\n        <li>\n          <a rel=\"next\" class=\"disabled\" role=\"button\" aria-labelledby=\"next-label\">\n            <span class=\"chapter-control\" id =\"next-label\">Next Chapter</span>\n            " + IconLib.icons.next + "\n          </a>\n        </li>\n      </ul>\n    </div>\n    <!-- /controls -->\n  </nav>\n";
     /** Class that shows webpub resources in an iframe, with navigation controls outside the iframe. */
     var IFrameNavigator = /** @class */ (function () {
         function IFrameNavigator(store, cacher, settings, annotator, publisher, serif, sans, day, sepia, night, paginator, scroller, eventHandler, upLinkConfig, allowFullscreen) {
@@ -1532,6 +1663,7 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             this.eventHandler = eventHandler || new EventHandler_1.default();
             this.upLinkConfig = upLinkConfig;
             this.allowFullscreen = allowFullscreen;
+            this.navigatorPositionChanged = this.navigatorPositionChanged.bind(this);
         }
         IFrameNavigator.create = function (config) {
             return __awaiter(this, void 0, void 0, function () {
@@ -1543,7 +1675,56 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                             return [4 /*yield*/, navigator.start(config.element, config.manifestUrl)];
                         case 1:
                             _a.sent();
+                            navigator.handleIFrameLoad();
+                            navigator.iframeRoot = document.getElementById('iframe-container') || document.createElement('div');
+                            navigator.updateBookView();
+                            navigator.setupEvents();
+                            // Debug
+                            // @ts-ignore
+                            window.context = navigator.renditionContext;
+                            // await navigator.start(config.element, config.manifestUrl);
                             return [2 /*return*/, navigator];
+                    }
+                });
+            });
+        };
+        IFrameNavigator.prototype.setInitialViewSettings = function (settings) {
+            var _this = this;
+            this.navView.updateTheme(settings.getSelectedTheme().name);
+            this.navView.updateFontSize(settings.getSelectedFontSize());
+            this.navigatorPositionChanged();
+            this.navView.addLocationChangedListener(function () {
+                _this.navigatorPositionChanged();
+            });
+        };
+        IFrameNavigator.prototype.reloadNavigator = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.navView) {
+                                this.navView.destroy();
+                            }
+                            // const shouldScroll = this.settings.getSelectedView() === this.scroller;
+                            // this.navView = new R2NavigatorView({
+                            //     viewAsVertical: shouldScroll,
+                            //     enableScroll: shouldScroll,
+                            // });
+                            this.navView = new SimpleNavigatorView_1.SimpleNavigatorView({
+                                paginator: this.paginator,
+                                settings: this.settings,
+                                manifestUrl: this.manifestUrl,
+                                store: this.store,
+                            });
+                            return [4 /*yield*/, this.navView.loadPublication(this.manifestUrl.href, this.iframeRoot)];
+                        case 1:
+                            _a.sent();
+                            // await this.navView.loadPublication('', this.iframeRoot);
+                            this.setInitialViewSettings(this.settings);
+                            this.settings.onFontChange(this.navView.updateFont);
+                            this.settings.onFontSizeChange(this.navView.updateFontSize);
+                            this.settings.onThemeChange(this.navView.updateTheme);
+                            return [2 /*return*/];
                     }
                 });
             });
@@ -1559,7 +1740,7 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                             _a.label = 1;
                         case 1:
                             _a.trys.push([1, 3, , 4]);
-                            this.iframe = HTMLUtilities.findRequiredElement(element, "iframe");
+                            this.iframe = document.createElement('iframe'); // HTMLUtilities.findRequiredElement(element, "iframe") as HTMLIFrameElement;
                             this.scrollingSuggestion = HTMLUtilities.findRequiredElement(element, ".scrolling-suggestion");
                             this.nextChapterLink = HTMLUtilities.findRequiredElement(element, "a[rel=next]");
                             this.previousChapterLink = HTMLUtilities.findRequiredElement(element, "a[rel=prev]");
@@ -1579,11 +1760,10 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                             this.chapterTitle = HTMLUtilities.findRequiredElement(this.infoBottom, "span[class=chapter-title]");
                             this.chapterPosition = HTMLUtilities.findRequiredElement(this.infoBottom, "span[class=chapter-position]");
                             this.menuControl = HTMLUtilities.findRequiredElement(element, "button.trigger");
-                            this.newPosition = null;
-                            this.newElementId = null;
-                            this.isBeingStyled = true;
+                            // this.newPosition = null;
+                            // this.newElementId = null;
+                            // this.isBeingStyled = true;
                             this.isLoading = true;
-                            this.setupEvents();
                             if (this.publisher) {
                                 this.publisher.bookElement = this.iframe;
                             }
@@ -1609,9 +1789,6 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                                 this.scroller.bookElement = this.iframe;
                             }
                             this.settings.renderControls(this.settingsView);
-                            this.settings.onFontChange(this.updateFont.bind(this));
-                            this.settings.onFontSizeChange(this.updateFontSize.bind(this));
-                            this.settings.onViewChange(this.updateBookView.bind(this));
                             settingsButtons = this.settingsView.querySelectorAll("button");
                             if (settingsButtons && settingsButtons.length > 0) {
                                 lastSettingsButton = settingsButtons[settingsButtons.length - 1];
@@ -1637,8 +1814,8 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             });
         };
         IFrameNavigator.prototype.setupEvents = function () {
+            // this.iframe.addEventListener("load", this.handleIFrameLoad.bind(this));
             var _this = this;
-            this.iframe.addEventListener("load", this.handleIFrameLoad.bind(this));
             var delay = 200;
             var timeout;
             window.addEventListener("resize", function () {
@@ -1658,12 +1835,36 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             this.settingsControl.addEventListener("keydown", this.hideSettingsOnEscape.bind(this));
             this.settingsView.addEventListener("keydown", this.hideSettingsOnEscape.bind(this));
             window.addEventListener("keydown", this.handleKeyboardNavigation.bind(this));
+            var nextPageBtn = document.getElementById('next-page-btn');
+            if (nextPageBtn) {
+                nextPageBtn.addEventListener('click', this.handleNextPageClick.bind(this));
+            }
+            var prevPageBtn = document.getElementById('prev-page-btn');
+            if (prevPageBtn) {
+                prevPageBtn.addEventListener('click', this.handlePreviousPageClick.bind(this));
+            }
             if (this.allowFullscreen && this.canFullscreen) {
                 document.addEventListener("fullscreenchange", this.toggleFullscreenIcon.bind(this));
                 document.addEventListener("webkitfullscreenchange", this.toggleFullscreenIcon.bind(this));
                 document.addEventListener("mozfullscreenchange", this.toggleFullscreenIcon.bind(this));
                 document.addEventListener("MSFullscreenChange", this.toggleFullscreenIcon.bind(this));
             }
+            this.settings.onViewChange(this.updateBookView.bind(this));
+        };
+        IFrameNavigator.prototype.navigatorPositionChanged = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var chapterInfo;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.navView.getChapterInfo()];
+                        case 1:
+                            chapterInfo = _a.sent();
+                            this.updateChapter(chapterInfo.title);
+                            this.setActiveTOCItem(chapterInfo.href);
+                            return [2 /*return*/];
+                    }
+                });
+            });
         };
         IFrameNavigator.prototype.setupModalFocusTrap = function (modal, closeButton, lastFocusableElement) {
             var _this = this;
@@ -1697,25 +1898,17 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
         IFrameNavigator.prototype.handleKeyboardNavigation = function (event) {
             var LEFT_ARROW = 37;
             var RIGHT_ARROW = 39;
-            if (this.settings.getSelectedView() === this.paginator) {
-                if (event.keyCode === LEFT_ARROW) {
-                    this.handlePreviousPageClick(event);
-                }
-                else if (event.keyCode === RIGHT_ARROW) {
-                    this.handleNextPageClick(event);
-                }
+            if (event.keyCode === LEFT_ARROW) {
+                this.handlePreviousPageClick(event);
+            }
+            else if (event.keyCode === RIGHT_ARROW) {
+                this.handleNextPageClick(event);
             }
         };
         ;
-        IFrameNavigator.prototype.updateFont = function () {
-            this.handleResize();
-        };
-        IFrameNavigator.prototype.updateFontSize = function () {
-            this.handleResize();
-        };
         IFrameNavigator.prototype.updateBookView = function () {
-            var _this = this;
             var doNothing = function () { };
+            var displayState = '';
             if (this.settings.getSelectedView() === this.paginator) {
                 this.scrollingSuggestion.style.display = "block";
                 document.body.onscroll = function () { };
@@ -1734,29 +1927,28 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                     this.eventHandler.onLeftArrow = this.handleKeyboardNavigation.bind(this);
                     this.eventHandler.onRightArrow = this.handleKeyboardNavigation.bind(this);
                 }
-                if (this.isDisplayed(this.linksBottom)) {
-                    this.toggleDisplay(this.linksBottom);
-                }
+                // if (this.isDisplayed(this.linksBottom)) {
+                //     this.toggleDisplay(this.linksBottom);
+                // }
             }
             else if (this.settings.getSelectedView() === this.scroller) {
                 this.scrollingSuggestion.style.display = "none";
-                document.body.onscroll = function () {
-                    _this.saveCurrentReadingPosition();
-                    if (_this.scroller && _this.scroller.atBottom()) {
-                        // Bring up the bottom nav when you get to the bottom,
-                        // if it wasn't already displayed.
-                        if (!_this.isDisplayed(_this.linksBottom)) {
-                            _this.toggleDisplay(_this.linksBottom);
-                        }
-                    }
-                    else {
-                        // Remove the bottom nav when you scroll back up,
-                        // if it was displayed because you were at the bottom.
-                        if (_this.isDisplayed(_this.linksBottom) && !_this.isDisplayed(_this.links)) {
-                            _this.toggleDisplay(_this.linksBottom);
-                        }
-                    }
-                };
+                // document.body.onscroll = () => {
+                //     this.saveCurrentReadingPosition();
+                //     if (this.scroller && this.scroller.atBottom()) {
+                //         // Bring up the bottom nav when you get to the bottom,
+                //         // if it wasn't already displayed.
+                //         if (!this.isDisplayed(this.linksBottom)) {
+                //             this.toggleDisplay(this.linksBottom);
+                //         }
+                //     } else {
+                //         // Remove the bottom nav when you scroll back up,
+                //         // if it was displayed because you were at the bottom.
+                //         if (this.isDisplayed(this.linksBottom) && !this.isDisplayed(this.links)) {
+                //             this.toggleDisplay(this.linksBottom);
+                //         }
+                //     }
+                // }
                 this.chapterTitle.style.display = "none";
                 this.chapterPosition.style.display = "none";
                 if (this.eventHandler) {
@@ -1773,11 +1965,24 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                     this.eventHandler.onRightArrow = doNothing;
                     this.handleRemoveHover();
                 }
-                if (this.isDisplayed(this.links) && !this.isDisplayed(this.linksBottom)) {
-                    this.toggleDisplay(this.linksBottom);
-                }
+                // if (this.isDisplayed(this.links) && !this.isDisplayed(this.linksBottom)) {
+                //     this.toggleDisplay(this.linksBottom);
+                // }
+                displayState = 'none';
+            }
+            if (this.isDisplayed(this.linksBottom)) {
+                this.toggleDisplay(this.linksBottom);
+            }
+            var prevPageBtn = document.getElementById('prev-page-btn');
+            var nextPageBtn = document.getElementById('next-page-btn');
+            if (prevPageBtn) {
+                prevPageBtn.style.setProperty('display', displayState);
+            }
+            if (nextPageBtn) {
+                nextPageBtn.style.setProperty('display', displayState);
             }
             this.updatePositionInfo();
+            this.reloadNavigator();
         };
         IFrameNavigator.prototype.enableOffline = function () {
             if (this.cacher && this.cacher.getStatus() !== Cacher_1.CacheStatus.Downloaded) {
@@ -1807,74 +2012,80 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             }
             statusElement.innerHTML = statusMessage;
         };
+        IFrameNavigator.prototype.createTOC = function (parentElement, links) {
+            var _this = this;
+            var listElement = document.createElement("ol");
+            var lastLink = null;
+            for (var _i = 0, links_1 = links; _i < links_1.length; _i++) {
+                var link = links_1[_i];
+                var listItemElement = document.createElement("li");
+                var linkElement = document.createElement("a");
+                var spanElement = document.createElement("span");
+                linkElement.tabIndex = -1;
+                var href = "";
+                if (link.href) {
+                    href = new URL(link.href, this.manifestUrl.href).href;
+                    linkElement.href = href;
+                    linkElement.innerHTML = link.title || "";
+                    listItemElement.appendChild(linkElement);
+                }
+                else {
+                    spanElement.innerHTML = link.title || "";
+                    listItemElement.appendChild(spanElement);
+                }
+                if (link.children && link.children.length > 0) {
+                    this.createTOC(listItemElement, link.children);
+                }
+                listElement.appendChild(listItemElement);
+                lastLink = linkElement;
+            }
+            // Trap keyboard focus inside the TOC while it's open.
+            if (lastLink) {
+                this.setupModalFocusTrap(this.tocView, this.contentsControl, lastLink);
+            }
+            listElement.addEventListener("click", function (event) { return __awaiter(_this, void 0, void 0, function () {
+                var linkElement;
+                return __generator(this, function (_a) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (event.target && event.target.tagName.toLowerCase() === "a") {
+                        linkElement = event.target;
+                        if (linkElement.className.indexOf("active") !== -1) {
+                            // This TOC item is already loaded. Hide the TOC
+                            // but don't navigate.
+                            this.hideTOC();
+                        }
+                        else {
+                            // Set focus back to the contents toggle button so screen readers
+                            // don't get stuck on a hidden link.
+                            this.contentsControl.focus();
+                            // this.navigate({
+                            //     resource: linkElement.href,
+                            //     position: 0
+                            // });
+                            this.navView.goToHrefLocation(linkElement.href);
+                            this.hideTOC();
+                        }
+                    }
+                    return [2 /*return*/];
+                });
+            }); });
+            parentElement.appendChild(listElement);
+        };
         IFrameNavigator.prototype.loadManifest = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var manifest, toc, createTOC_1, upLabel, upAriaLabel, upHTML, upParent, fullscreenHTML, fullscreenParent, lastReadingPosition, startLink, startUrl, position, err_3;
-                var _this = this;
+                var manifest, toc, upLabel, upAriaLabel, upHTML, upParent, fullscreenHTML, fullscreenParent, lastReadingPosition, startLink, startUrl, err_3;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             _a.trys.push([0, 4, , 5]);
-                            return [4 /*yield*/, Manifest_1.default.getManifest(this.manifestUrl, this.store)];
+                            return [4 /*yield*/, Manifest_2.default.getManifest(this.manifestUrl, this.store)];
                         case 1:
                             manifest = _a.sent();
                             toc = manifest.toc;
                             if (toc.length) {
                                 this.contentsControl.className = "contents";
-                                createTOC_1 = function (parentElement, links) {
-                                    var listElement = document.createElement("ol");
-                                    var lastLink = null;
-                                    for (var _i = 0, links_1 = links; _i < links_1.length; _i++) {
-                                        var link = links_1[_i];
-                                        var listItemElement = document.createElement("li");
-                                        var linkElement = document.createElement("a");
-                                        var spanElement = document.createElement("span");
-                                        linkElement.tabIndex = -1;
-                                        var href = "";
-                                        if (link.href) {
-                                            href = new URL(link.href, _this.manifestUrl.href).href;
-                                            linkElement.href = href;
-                                            linkElement.innerHTML = link.title || "";
-                                            listItemElement.appendChild(linkElement);
-                                        }
-                                        else {
-                                            spanElement.innerHTML = link.title || "";
-                                            listItemElement.appendChild(spanElement);
-                                        }
-                                        if (link.children && link.children.length > 0) {
-                                            createTOC_1(listItemElement, link.children);
-                                        }
-                                        listElement.appendChild(listItemElement);
-                                        lastLink = linkElement;
-                                    }
-                                    // Trap keyboard focus inside the TOC while it's open.
-                                    if (lastLink) {
-                                        _this.setupModalFocusTrap(_this.tocView, _this.contentsControl, lastLink);
-                                    }
-                                    listElement.addEventListener("click", function (event) {
-                                        event.preventDefault();
-                                        event.stopPropagation();
-                                        if (event.target && event.target.tagName.toLowerCase() === "a") {
-                                            var linkElement = event.target;
-                                            if (linkElement.className.indexOf("active") !== -1) {
-                                                // This TOC item is already loaded. Hide the TOC
-                                                // but don't navigate.
-                                                _this.hideTOC();
-                                            }
-                                            else {
-                                                // Set focus back to the contents toggle button so screen readers
-                                                // don't get stuck on a hidden link.
-                                                _this.contentsControl.focus();
-                                                _this.navigate({
-                                                    resource: linkElement.href,
-                                                    position: 0
-                                                });
-                                            }
-                                        }
-                                    });
-                                    parentElement.appendChild(listElement);
-                                };
-                                createTOC_1(this.tocView, toc);
+                                this.createTOC(this.tocView, toc);
                             }
                             else {
                                 this.contentsControl.parentElement.style.display = "none";
@@ -1911,14 +2122,14 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                                 startUrl = new URL(startLink.href, this.manifestUrl.href).href;
                             }
                             if (lastReadingPosition) {
-                                this.navigate(lastReadingPosition);
+                                // this.navigate(lastReadingPosition);
                             }
                             else if (startUrl) {
-                                position = {
-                                    resource: startUrl,
-                                    position: 0
-                                };
-                                this.navigate(position);
+                                // const position = {
+                                //     resource: startUrl,
+                                //     position: 0
+                                // };
+                                // this.navigate(position);
                             }
                             return [2 /*return*/, new Promise(function (resolve) { return resolve(); })];
                         case 4:
@@ -1932,107 +2143,90 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
         };
         IFrameNavigator.prototype.handleIFrameLoad = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var bookViewPosition, currentLocation, elementId, manifest, previous, next, chapterTitle, spineItem, tocItem, err_4;
+                var manifest, err_4;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             this.errorMessage.style.display = "none";
-                            this.showLoadingMessageAfterDelay();
                             _a.label = 1;
                         case 1:
-                            _a.trys.push([1, 5, , 6]);
+                            _a.trys.push([1, 3, , 4]);
                             this.hideTOC();
-                            bookViewPosition = 0;
-                            if (this.newPosition) {
-                                bookViewPosition = this.newPosition.position;
-                                this.newPosition = null;
-                            }
-                            this.updateFont();
-                            this.updateFontSize();
-                            this.updateBookView();
-                            this.settings.getSelectedFont().start();
+                            // let bookViewPosition = 0;
+                            // if (this.newPosition) {
+                            //     bookViewPosition = this.newPosition.position;
+                            //     this.newPosition = null;
+                            // }
+                            // this.updateFont();
+                            // this.updateFontSize();
+                            // this.updateBookView();
+                            // this.settings.getSelectedFont().start();
                             this.settings.getSelectedTheme().start();
-                            this.settings.getSelectedView().start(bookViewPosition);
-                            if (this.newElementId) {
-                                this.settings.getSelectedView().goToElement(this.newElementId);
-                                this.newElementId = null;
-                            }
-                            currentLocation = this.iframe.src;
-                            if (this.iframe.contentDocument && this.iframe.contentDocument.location && this.iframe.contentDocument.location.href) {
-                                currentLocation = this.iframe.contentDocument.location.href;
-                            }
-                            if (currentLocation.indexOf("#") !== -1) {
-                                elementId = currentLocation.slice(currentLocation.indexOf("#") + 1);
-                                // Set the element to go to the next time the iframe loads.
-                                this.newElementId = elementId;
-                                // Reload the iframe without the anchor.
-                                this.iframe.src = currentLocation.slice(0, currentLocation.indexOf("#"));
-                                return [2 /*return*/, new Promise(function (resolve) { return resolve(); })];
-                            }
-                            this.updatePositionInfo();
-                            return [4 /*yield*/, Manifest_1.default.getManifest(this.manifestUrl, this.store)];
+                            return [4 /*yield*/, Manifest_2.default.getManifest(this.manifestUrl, this.store)];
                         case 2:
                             manifest = _a.sent();
-                            previous = manifest.getPreviousSpineItem(currentLocation);
-                            if (previous && previous.href) {
-                                this.previousChapterLink.href = new URL(previous.href, this.manifestUrl.href).href;
-                                this.previousChapterLink.className = "";
-                            }
-                            else {
-                                this.previousChapterLink.removeAttribute("href");
-                                this.previousChapterLink.className = "disabled";
-                                this.handleRemoveHover();
-                            }
-                            next = manifest.getNextSpineItem(currentLocation);
-                            if (next && next.href) {
-                                this.nextChapterLink.href = new URL(next.href, this.manifestUrl.href).href;
-                                this.nextChapterLink.className = "";
-                            }
-                            else {
-                                this.nextChapterLink.removeAttribute("href");
-                                this.nextChapterLink.className = "disabled";
-                                this.handleRemoveHover();
-                            }
-                            this.setActiveTOCItem(currentLocation);
+                            // const previous = manifest.getPreviousSpineItem(currentLocation);
+                            // if (previous && previous.href) {
+                            //     this.previousChapterLink.href = new URL(previous.href, this.manifestUrl.href).href;
+                            //     this.previousChapterLink.className = "";
+                            // } else {
+                            //     this.previousChapterLink.removeAttribute("href");
+                            //     this.previousChapterLink.className = "disabled";
+                            //     this.handleRemoveHover();
+                            // }
+                            // const next = manifest.getNextSpineItem(currentLocation);
+                            // if (next && next.href) {
+                            //     this.nextChapterLink.href = new URL(next.href, this.manifestUrl.href).href;
+                            //     this.nextChapterLink.className = "";
+                            // } else {
+                            //     this.nextChapterLink.removeAttribute("href");
+                            //     this.nextChapterLink.className = "disabled";
+                            //     this.handleRemoveHover();
+                            // }
+                            // this.setActiveTOCItem(currentLocation);
                             if (manifest.metadata.title) {
                                 this.bookTitle.innerHTML = manifest.metadata.title;
                             }
-                            chapterTitle = void 0;
-                            spineItem = manifest.getSpineItem(currentLocation);
-                            if (spineItem !== null) {
-                                chapterTitle = spineItem.title;
-                            }
-                            if (!chapterTitle) {
-                                tocItem = manifest.getTOCItem(currentLocation);
-                                if (tocItem !== null && tocItem.title) {
-                                    chapterTitle = tocItem.title;
-                                }
-                            }
-                            if (chapterTitle) {
-                                this.chapterTitle.innerHTML = "(" + chapterTitle + ")";
-                            }
-                            else {
-                                this.chapterTitle.innerHTML = "(Current Chapter)";
-                            }
-                            if (this.eventHandler) {
-                                this.eventHandler.setupEvents(this.iframe.contentDocument);
-                            }
-                            if (!this.annotator) return [3 /*break*/, 4];
-                            return [4 /*yield*/, this.saveCurrentReadingPosition()];
-                        case 3:
-                            _a.sent();
-                            _a.label = 4;
-                        case 4:
-                            this.hideLoadingMessage();
-                            this.showIframeContents();
-                            Object.defineProperty(this.iframe.contentWindow.navigator, "epubReadingSystem", { value: epubReadingSystem, writable: false });
+                            // const spineItem = manifest.getSpineItem(currentLocation);
+                            // if (spineItem !== null) {
+                            //     chapterTitle = spineItem.title;
+                            // }
+                            // if (!chapterTitle) {
+                            //     const tocItem = manifest.getTOCItem(currentLocation);
+                            //     if (tocItem !== null && tocItem.title) {
+                            //         chapterTitle = tocItem.title;
+                            //     }
+                            // }
+                            this.updateChapter();
+                            // if (this.eventHandler) {
+                            // this.eventHandler.setupEvents(this.iframe.contentDocument);
+                            // }
+                            // if (this.annotator) {
+                            //     await this.saveCurrentReadingPosition();
+                            // }
+                            // this.hideLoadingMessage();
+                            // this.showIframeContents();
+                            // Object.defineProperty(((this.iframe.contentWindow as any).navigator as EpubReadingSystem), "epubReadingSystem", {value: epubReadingSystem, writable: false});
                             return [2 /*return*/, new Promise(function (resolve) { return resolve(); })];
-                        case 5:
+                        case 3:
                             err_4 = _a.sent();
                             this.abortOnError();
                             return [2 /*return*/, new Promise(function (_, reject) { return reject(err_4); }).catch(function () { })];
-                        case 6: return [2 /*return*/];
+                        case 4: return [2 /*return*/];
                     }
+                });
+            });
+        };
+        IFrameNavigator.prototype.updateChapter = function (title) {
+            return __awaiter(this, void 0, void 0, function () {
+                var newTitle;
+                return __generator(this, function (_a) {
+                    newTitle = 'Current Chapter';
+                    if (title) {
+                        newTitle = title;
+                    }
+                    this.chapterTitle.innerHTML = "(" + newTitle + ")";
+                    return [2 /*return*/];
                 });
             });
         };
@@ -2207,52 +2401,54 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             this.hideSettings();
             this.toggleDisplay(this.links, this.menuControl);
             if (this.settings.getSelectedView() === this.scroller) {
-                if (!this.scroller.atBottom()) {
-                    this.toggleDisplay(this.linksBottom);
-                }
+                // if (!this.scroller.atBottom()) {
+                //     this.toggleDisplay(this.linksBottom);
+                // }
             }
             event.preventDefault();
             event.stopPropagation();
         };
+        // @ts-ignore
         IFrameNavigator.prototype.handlePreviousPageClick = function (event) {
-            if (this.paginator) {
-                if (this.paginator.onFirstPage()) {
-                    if (this.previousChapterLink.hasAttribute("href")) {
-                        var position = {
-                            resource: this.previousChapterLink.href,
-                            position: 1
-                        };
-                        this.navigate(position);
-                    }
-                }
-                else {
-                    this.paginator.goToPreviousPage();
-                    this.updatePositionInfo();
-                    this.saveCurrentReadingPosition();
-                }
-                event.preventDefault();
-                event.stopPropagation();
-            }
+            // if (this.paginator) {
+            //     if (this.paginator.onFirstPage()) {
+            //         if (this.previousChapterLink.hasAttribute("href")) {
+            //             const position = {
+            //                 resource: this.previousChapterLink.href,
+            //                 position: 1
+            //             };
+            //             this.navigate(position);
+            //         }
+            //     } else {
+            //         this.paginator.goToPreviousPage();
+            //         this.updatePositionInfo();
+            //         this.saveCurrentReadingPosition();
+            //     }
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            // }
+            this.navView.previousScreen();
         };
+        // @ts-ignore
         IFrameNavigator.prototype.handleNextPageClick = function (event) {
-            if (this.paginator) {
-                if (this.paginator.onLastPage()) {
-                    if (this.nextChapterLink.hasAttribute("href")) {
-                        var position = {
-                            resource: this.nextChapterLink.href,
-                            position: 0
-                        };
-                        this.navigate(position);
-                    }
-                }
-                else {
-                    this.paginator.goToNextPage();
-                    this.updatePositionInfo();
-                    this.saveCurrentReadingPosition();
-                }
-                event.preventDefault();
-                event.stopPropagation();
-            }
+            // if (this.paginator) {
+            //     if (this.paginator.onLastPage()) {
+            //         if (this.nextChapterLink.hasAttribute("href")) {
+            //             const position = {
+            //                 resource: this.nextChapterLink.href,
+            //                 position: 0
+            //             };
+            //             this.navigate(position);
+            //         }
+            //     } else {
+            //         this.paginator.goToNextPage();
+            //         this.updatePositionInfo();
+            //         this.saveCurrentReadingPosition();
+            //     }
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            // }
+            this.navView.nextScreen();
         };
         IFrameNavigator.prototype.handleLeftHover = function () {
             if (this.paginator) {
@@ -2297,22 +2493,29 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
         IFrameNavigator.prototype.handleResize = function () {
             var selectedView = this.settings.getSelectedView();
             var oldPosition = selectedView.getCurrentPosition();
-            var fontSize = this.settings.getSelectedFontSize();
-            var body = HTMLUtilities.findRequiredIframeElement(this.iframe.contentDocument, "body");
-            body.style.fontSize = fontSize;
-            body.style.lineHeight = "1.5";
-            var fontSizeNumber = parseInt(fontSize.slice(0, -2));
-            var sideMargin = fontSizeNumber * 2;
-            if (BrowserUtilities.getWidth() > fontSizeNumber * 45) {
-                var extraMargin = Math.floor((BrowserUtilities.getWidth() - fontSizeNumber * 40) / 2);
-                sideMargin = sideMargin + extraMargin;
-            }
-            if (this.paginator) {
-                this.paginator.sideMargin = sideMargin;
-            }
-            if (this.scroller) {
-                this.scroller.sideMargin = sideMargin;
-            }
+            // const fontSize = this.settings.getSelectedFontSize();
+            // const body = HTMLUtilities.findRequiredIframeElement(this.iframe.contentDocument, "body") as HTMLBodyElement;
+            // body.style.fontSize = fontSize;
+            // body.style.lineHeight = "1.5";
+            // const fontSizeNumber = parseInt(fontSize.slice(0, -2));
+            // let sideMargin = fontSizeNumber * 2;
+            // Disable text selection as we can’t handle this correctly anyway
+            // body.style.webkitUserSelect = "none";
+            // (body as any).style.MozUserSelect = "none";
+            // body.style.msUserSelect = "none";
+            // body.style.userSelect = "none";
+            // const fontSizeNumber = parseInt(fontSize.slice(0, -2));
+            // let sideMargin = fontSizeNumber * 2;
+            // if (BrowserUtilities.getWidth() > fontSizeNumber * 45) {
+            // const extraMargin = Math.floor((BrowserUtilities.getWidth() - fontSizeNumber * 40) / 2);
+            // sideMargin = sideMargin + extraMargin;
+            // }
+            // if (this.paginator) {
+            // this.paginator.sideMargin = sideMargin;
+            // }
+            // if (this.scroller) {
+            // this.scroller.sideMargin = sideMargin;
+            // }
             // If the links are hidden, show them temporarily
             // to determine the top and bottom heights.
             var linksHidden = !this.isDisplayed(this.links);
@@ -2326,12 +2529,12 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             }
             var linksBottomHidden = !this.isDisplayed(this.linksBottom);
             if (linksBottomHidden) {
-                this.toggleDisplay(this.linksBottom);
+                // this.toggleDisplay(this.linksBottom);
             }
             var bottomHeight = this.linksBottom.clientHeight;
             this.infoBottom.style.height = bottomHeight + "px";
             if (linksBottomHidden) {
-                this.toggleDisplay(this.linksBottom);
+                // this.toggleDisplay(this.linksBottom);
             }
             if (this.paginator) {
                 this.paginator.height = (BrowserUtilities.getHeight() - topHeight - bottomHeight - 10);
@@ -2343,34 +2546,33 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             this.updatePositionInfo();
         };
         IFrameNavigator.prototype.updatePositionInfo = function () {
-            if (this.settings.getSelectedView() === this.paginator) {
-                var currentPage = Math.round(this.paginator.getCurrentPage());
-                var pageCount = Math.round(this.paginator.getPageCount());
-                this.chapterPosition.innerHTML = "Page " + currentPage + " of " + pageCount;
-            }
-            else {
-                this.chapterPosition.innerHTML = "";
-            }
+            // if (this.settings.getSelectedView() === this.paginator) {
+            //     const currentPage = Math.round(this.paginator.getCurrentPage());
+            //     const pageCount = Math.round(this.paginator.getPageCount());
+            //     this.chapterPosition.innerHTML = "Page " + currentPage + " of " + pageCount;
+            // } else {
+            this.chapterPosition.innerHTML = "";
+            // }
         };
         IFrameNavigator.prototype.handlePreviousChapterClick = function (event) {
-            if (this.previousChapterLink.hasAttribute("href")) {
-                var position = {
-                    resource: this.previousChapterLink.href,
-                    position: 0
-                };
-                this.navigate(position);
-            }
+            // if (this.previousChapterLink.hasAttribute("href")) {
+            //     const position = {
+            //         resource: this.previousChapterLink.href,
+            //         position: 0
+            //     }
+            //     this.navigate(position);
+            // }
             event.preventDefault();
             event.stopPropagation();
         };
         IFrameNavigator.prototype.handleNextChapterClick = function (event) {
-            if (this.nextChapterLink.hasAttribute("href")) {
-                var position = {
-                    resource: this.nextChapterLink.href,
-                    position: 0
-                };
-                this.navigate(position);
-            }
+            // if (this.nextChapterLink.hasAttribute("href")) {
+            //     const position = {
+            //         resource: this.nextChapterLink.href,
+            //         position: 0
+            //     };
+            //     this.navigate(position);
+            // }
             event.preventDefault();
             event.stopPropagation();
         };
@@ -2405,11 +2607,8 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
             var allItems = Array.prototype.slice.call(this.tocView.querySelectorAll("li > a"));
             for (var _i = 0, allItems_1 = allItems; _i < allItems_1.length; _i++) {
                 var item = allItems_1[_i];
-                item.className = "";
-            }
-            var activeItem = this.tocView.querySelector('li > a[href^="' + resource + '"]');
-            if (activeItem) {
-                activeItem.className = "active";
+                var classVal = item.href.includes(resource) ? 'active' : '';
+                item.setAttribute('class', classVal);
             }
         };
         IFrameNavigator.prototype.handleSettingsClick = function (event) {
@@ -2427,54 +2626,50 @@ define("IFrameNavigator", ["require", "exports", "Cacher", "Manifest", "EventHan
                 this.hideSettings();
             }
         };
-        IFrameNavigator.prototype.navigate = function (readingPosition) {
-            this.hideIframeContents();
-            this.showLoadingMessageAfterDelay();
-            this.newPosition = readingPosition;
-            if (readingPosition.resource.indexOf("#") === -1) {
-                this.iframe.src = readingPosition.resource;
-            }
-            else {
-                // We're navigating to an anchor within the resource,
-                // rather than the resource itself. Go to the resource
-                // first, then go to the anchor.
-                this.newElementId = readingPosition.resource.slice(readingPosition.resource.indexOf("#") + 1);
-                var newResource = readingPosition.resource.slice(0, readingPosition.resource.indexOf("#"));
-                if (newResource === this.iframe.src) {
-                    // The resource isn't changing, but handle it like a new
-                    // iframe load to hide the menus and popups and go to the 
-                    // new element.
-                    this.handleIFrameLoad();
-                }
-                else {
-                    this.iframe.src = newResource;
-                }
-            }
-        };
-        IFrameNavigator.prototype.showIframeContents = function () {
-            var _this = this;
-            this.isBeingStyled = false;
-            // We set a timeOut so that settings can be applied when opacity is still 0
-            setTimeout(function () {
-                if (!_this.isBeingStyled) {
-                    _this.iframe.style.opacity = "1";
-                }
-            }, 150);
-        };
-        IFrameNavigator.prototype.showLoadingMessageAfterDelay = function () {
-            var _this = this;
-            this.isLoading = true;
-            setTimeout(function () {
-                if (_this.isLoading) {
-                    _this.loadingMessage.style.display = "block";
-                    _this.loadingMessage.classList.add("is-loading");
-                }
-            }, 200);
-        };
-        IFrameNavigator.prototype.hideIframeContents = function () {
-            this.isBeingStyled = true;
-            this.iframe.style.opacity = "0";
-        };
+        // private navigate(readingPosition: ReadingPosition): void {
+        //     this.hideIframeContents();
+        //     this.showLoadingMessageAfterDelay();
+        //     // this.newPosition = readingPosition;
+        //     if (readingPosition.resource.indexOf("#") === -1) {
+        //         this.iframe.src = readingPosition.resource;
+        //     } else {
+        //         // We're navigating to an anchor within the resource,
+        //         // rather than the resource itself. Go to the resource
+        //         // first, then go to the anchor.
+        //         // this.newElementId = readingPosition.resource.slice(readingPosition.resource.indexOf("#") + 1)
+        //         const newResource = readingPosition.resource.slice(0, readingPosition.resource.indexOf("#"))
+        //         if (newResource === this.iframe.src) {
+        //             // The resource isn't changing, but handle it like a new
+        //             // iframe load to hide the menus and popups and go to the 
+        //             // new element.
+        //             this.handleIFrameLoad();
+        //         } else {
+        //             this.iframe.src = newResource;
+        //         }
+        //     }
+        // }
+        // private showIframeContents() {
+        //     this.isBeingStyled = false;
+        //     // We set a timeOut so that settings can be applied when opacity is still 0
+        //     setTimeout(() => {
+        //         if (!this.isBeingStyled) {
+        //             this.iframe.style.opacity = "1";
+        //         }
+        //     }, 150);
+        // }
+        // private showLoadingMessageAfterDelay() {
+        //     this.isLoading = true;
+        //     setTimeout(() => {
+        //         if (this.isLoading) {
+        //             this.loadingMessage.style.display = "block";
+        //             this.loadingMessage.classList.add("is-loading");
+        //         }
+        //     }, 200);
+        // }
+        // private hideIframeContents() {
+        //     // this.isBeingStyled = true;
+        //     this.iframe.style.opacity = "0";
+        // }
         IFrameNavigator.prototype.hideLoadingMessage = function () {
             this.isLoading = false;
             this.loadingMessage.style.display = "none";
@@ -2632,7 +2827,206 @@ define("LocalStorageStore", ["require", "exports", "MemoryStore"], function (req
     }());
     exports.default = LocalStorageStore;
 });
-define("ServiceWorkerCacher", ["require", "exports", "Cacher", "Manifest"], function (require, exports, Cacher_2, Manifest_2) {
+// import {
+//   Publication,
+//   IFrameLoader,
+//   R2ContentViewFactory,
+//   RenditionContext as R2RenditionContext,
+//   Rendition,
+//   Location,
+//   SpreadMode,
+//   ScrollMode,
+//   SettingName,
+//   ViewportResizer
+// } from '@readium/navigator-web';
+// import { ChapterInfo } from './SimpleNavigatorView';
+// type settingsProps = {
+//   viewAsVertical: boolean,
+//   enableScroll: boolean,
+// };
+// export class R2NavigatorView {
+//   private rendCtx: R2RenditionContext;
+//   private viewportRoot: HTMLElement;
+//   private resizer?: ViewportResizer;
+//   private viewAsVertical: boolean = false;
+//   private enableScroll: boolean = false;
+//   public constructor(settings?: settingsProps) {
+//     this.viewAsVertical = settings != undefined ? settings.viewAsVertical : this.viewAsVertical;
+//     this.enableScroll = settings != undefined ? settings.enableScroll : this.enableScroll;
+//     this.bindOwnMethods();
+//   }
+//   public addLocationChangedListener(callback: Function) {
+//     this.rendCtx.rendition.viewport.addLocationChangedListener(callback);
+//   }
+//   public async getChapterInfo(): Promise<ChapterInfo> {
+//     let chapterInfo: ChapterInfo = {
+//       title: '',
+//       href: '',
+//     }
+//     if (this.rendCtx) {
+//       const pub = this.rendCtx.rendition.getPublication();
+//       const currentLoc = await this.rendCtx.navigator.getCurrentLocationAsync();
+//       let currentChap;
+//       if (currentLoc) {
+//           const chapterHref = currentLoc.getHref()
+//           currentChap = pub.toc.find((item: any) => {
+//               return ( chapterHref === item.href);
+//           });
+//           if (!currentChap) {
+//               currentChap = pub.toc[0];
+//           }
+//           chapterInfo.title = currentChap.title;
+//           chapterInfo.href = chapterHref;
+//       }
+//   }
+//     return chapterInfo;
+//   }
+//   public updateFont(font: string): void {
+//     let fontFam = '';
+//     let fontOverload = '';
+//     if (font === 'publisher-font') {
+//         fontOverload = 'readium-font-off';
+//     }
+//     else if (font === 'serif-font') {
+//         fontFam = '--RS__modernTf';
+//         fontOverload = 'readium-font-on';
+//     }
+//     else if (font === 'sans-font') {
+//         fontFam = '--RS__humanistTf';
+//         fontOverload = 'readium-font-on';
+//     }
+//     const settings = [{
+//         name: SettingName.FontFamily,
+//         value: `var(${fontFam})`
+//     },
+//     {
+//         name: SettingName.FontOverride,
+//         value: fontOverload
+//     }];
+//     this.rendCtx.rendition.updateViewSettings(settings);
+//   }
+//   public updateFontSize(newFontSize: number): void {
+//     const fontSettings = [{
+//         name: SettingName.FontSize,
+//         value: newFontSize * 100,
+//     }];
+//     this.rendCtx.rendition.updateViewSettings(fontSettings);
+//   }
+//   public updateTheme(theme: string): void {
+//       let themeSettings = {
+//           name: SettingName.ReadingMode,
+//           value: '',
+//       }
+//       if (theme === 'night-theme') {
+//           themeSettings.value = 'readium-night-on';
+//       }
+//       else if (theme === 'sepia-theme') {
+//           themeSettings.value = 'readium-sepia-on';
+//       }
+//       this.rendCtx.rendition.updateViewSettings([themeSettings]);
+//   }
+//   public nextScreen(): void {
+//     this.rendCtx.navigator.nextScreen();
+//   }
+//   public previousScreen(): void {
+//     this.rendCtx.navigator.previousScreen();
+//   }
+//   public goToHrefLocation(href: string): void {
+//     const pub = this.rendCtx.rendition.getPublication();
+//     const relHref = pub.getHrefRelativeToManifest(href);
+//     const loc = new Location('', relHref, true);
+//     this.rendCtx.navigator.gotoLocation(loc);
+//   }
+//   public destroy(): void {
+//     if (this.resizer) {
+//       this.resizer.stopListenResize();
+//     }
+//     const el = document.getElementById('layout-view-root');
+//     if (el) {
+//       el.remove();
+//     }
+//   }
+//   public async loadPublication(pubUrl: string, root: HTMLElement): Promise<void> {
+//     const publication: Publication = await Publication.fromURL(pubUrl);
+//     const loader = new IFrameLoader(publication.getBaseURI());
+//     loader.setReadiumCssBasePath('/readerJBKS/readium-css');
+//     const cvf = new R2ContentViewFactory(loader);
+//     const rendition = new Rendition(publication, root, cvf);
+//     rendition.setViewAsVertical(this.viewAsVertical);
+//     this.viewportRoot = root;
+//     this.rendCtx = new R2RenditionContext(rendition, loader);
+//     this.updateSize(false);
+//     rendition.setPageLayout({
+//         spreadMode: SpreadMode.FitViewportDoubleSpread,
+//         pageWidth: 0,
+//         pageHeight: 0,
+//     });
+//     await rendition.render();
+//     rendition.viewport.setScrollMode(this.enableScroll ? ScrollMode.Publication : ScrollMode.None);
+//     this.resizer = new ViewportResizer(this.rendCtx, this.updateSize);
+//     await this.rendCtx.navigator.gotoBegin();
+//   }
+//   private bindOwnMethods(): void {
+//     this.updateFont = this.updateFont.bind(this);
+//     this.updateFontSize = this.updateFontSize.bind(this);
+//     this.updateSize = this.updateSize.bind(this);
+//     this.updateTheme = this.updateTheme.bind(this);
+//   }
+//   private updateSize(willRefreshLayout: boolean = true): void {
+//     const availableWidth = this.getAvailableWidth();
+//     const availableHeight = this.getAvailableHeight();
+//     this.viewportRoot.style.width = `${availableWidth}px`;
+//     this.viewportRoot.style.height = `${availableHeight}px`;
+//     const scrollerWidthAdj = this.enableScroll ? 15 : 0;
+//     const viewportWidth = availableWidth - scrollerWidthAdj;
+//     const viewportHeight = availableHeight;
+//     const viewportSize = this.viewAsVertical ? viewportHeight : viewportWidth;
+//     const viewportSize2nd = this.viewAsVertical ? viewportWidth : viewportHeight;
+//     this.rendCtx.rendition.viewport.setViewportSize(viewportSize, viewportSize2nd);
+//     this.rendCtx.rendition.viewport.setPrefetchSize(Math.ceil(availableWidth * 0.1));
+//     if (willRefreshLayout) {
+//       this.rendCtx.rendition.refreshPageLayout();
+//     }
+//   }
+//   // Get available height for iframe container to sit within
+//   private getAvailableHeight(): number {
+//     const topBar = document.getElementById('top-control-bar');
+//     let topHeight = 0;
+//     if (topBar) {
+//         const topRect = topBar.getBoundingClientRect();
+//         topHeight = topRect.height;
+//     }
+//     const bottomBar = document.getElementById('bottom-control-bar');
+//     const bottomBar2 = document.getElementById('bottom-info-bar');
+//     let bottomHeight = 0;
+//     if (bottomBar) {
+//         const bottomRect = bottomBar.getBoundingClientRect();
+//         bottomHeight = bottomRect.height;
+//         if (bottomHeight <= 5 && bottomBar2) {
+//           const bottomRect2 = bottomBar2.getBoundingClientRect();
+//           bottomHeight = bottomRect2.height;
+//         }
+//     }
+//     return window.innerHeight - topHeight - bottomHeight;
+//   }
+//   // Get available width for iframe container to sit within
+//   private getAvailableWidth(): number {
+//       const prevBtn = document.getElementById('prev-page-btn');
+//       let prevBtnWidth = 0;
+//       if (prevBtn) {
+//           const rect = prevBtn.getBoundingClientRect();
+//           prevBtnWidth = rect.width;
+//       }
+//       const nextBtn = document.getElementById('next-page-btn');
+//       let nextBtnWidth = 0;
+//       if (nextBtn) {
+//           const rect = nextBtn.getBoundingClientRect();
+//           nextBtnWidth = rect.width;
+//       }
+//       return window.innerWidth - prevBtnWidth - nextBtnWidth;
+//   }
+// }
+define("ServiceWorkerCacher", ["require", "exports", "Cacher", "Manifest"], function (require, exports, Cacher_2, Manifest_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /** Class that caches responses using ServiceWorker's Cache API, and optionally
@@ -2734,7 +3128,7 @@ define("ServiceWorkerCacher", ["require", "exports", "Cacher", "Manifest"], func
                 var manifest, promises, _i, promises_2, promise;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, Manifest_2.default.getManifest(manifestUrl, this.store)];
+                        case 0: return [4 /*yield*/, Manifest_3.default.getManifest(manifestUrl, this.store)];
                         case 1:
                             manifest = _a.sent();
                             promises = [this.cacheSpine(manifest, manifestUrl), this.cacheResources(manifest, manifestUrl)];
@@ -2821,7 +3215,7 @@ define("app", ["require", "exports", "LocalStorageStore", "ServiceWorkerCacher",
                     publisher = new PublisherFont_1.default();
                     serif = new SerifFont_1.default();
                     sans = new SansFont_1.default();
-                    fontSizes = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32];
+                    fontSizes = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
                     day = new DayTheme_1.default();
                     sepia = new SepiaTheme_1.default();
                     night = new NightTheme_1.default();
@@ -2831,8 +3225,8 @@ define("app", ["require", "exports", "LocalStorageStore", "ServiceWorkerCacher",
                     return [4 /*yield*/, BookSettings_1.default.create({
                             store: settingsStore,
                             bookFonts: [publisher, serif, sans],
-                            fontSizesInPixels: fontSizes,
-                            defaultFontSizeInPixels: 20,
+                            fontSizes: fontSizes,
+                            defaultFontSize: 1,
                             bookThemes: [day, sepia, night],
                             bookViews: [paginator, scroller]
                         })];

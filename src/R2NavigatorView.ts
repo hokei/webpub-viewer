@@ -1,237 +1,237 @@
-import {
-  Publication,
-  IFrameLoader,
-  R2ContentViewFactory,
-  RenditionContext as R2RenditionContext,
-  Rendition,
-  Location,
-  SpreadMode,
-  ScrollMode,
-  SettingName,
-  ViewportResizer
-} from '@readium/navigator-web';
+// import {
+//   Publication,
+//   IFrameLoader,
+//   R2ContentViewFactory,
+//   RenditionContext as R2RenditionContext,
+//   Rendition,
+//   Location,
+//   SpreadMode,
+//   ScrollMode,
+//   SettingName,
+//   ViewportResizer
+// } from '@readium/navigator-web';
 
-import { ChapterInfo } from './SimpleNavigatorView';
+// import { ChapterInfo } from './SimpleNavigatorView';
 
-type settingsProps = {
-  viewAsVertical: boolean,
-  enableScroll: boolean,
-};
+// type settingsProps = {
+//   viewAsVertical: boolean,
+//   enableScroll: boolean,
+// };
 
-export class R2NavigatorView {
-  private rendCtx: R2RenditionContext;
-  private viewportRoot: HTMLElement;
-  private resizer?: ViewportResizer;
+// export class R2NavigatorView {
+//   private rendCtx: R2RenditionContext;
+//   private viewportRoot: HTMLElement;
+//   private resizer?: ViewportResizer;
 
-  private viewAsVertical: boolean = false;
-  private enableScroll: boolean = false;
+//   private viewAsVertical: boolean = false;
+//   private enableScroll: boolean = false;
 
-  public constructor(settings?: settingsProps) {
-    this.viewAsVertical = settings != undefined ? settings.viewAsVertical : this.viewAsVertical;
-    this.enableScroll = settings != undefined ? settings.enableScroll : this.enableScroll;
+//   public constructor(settings?: settingsProps) {
+//     this.viewAsVertical = settings != undefined ? settings.viewAsVertical : this.viewAsVertical;
+//     this.enableScroll = settings != undefined ? settings.enableScroll : this.enableScroll;
 
-    this.bindOwnMethods();
-  }
+//     this.bindOwnMethods();
+//   }
 
-  public addLocationChangedListener(callback: Function) {
-    this.rendCtx.rendition.viewport.addLocationChangedListener(callback);
-  }
+//   public addLocationChangedListener(callback: Function) {
+//     this.rendCtx.rendition.viewport.addLocationChangedListener(callback);
+//   }
 
-  public async getChapterInfo(): Promise<ChapterInfo> {
-    let chapterInfo: ChapterInfo = {
-      title: '',
-      href: '',
-    }
+//   public async getChapterInfo(): Promise<ChapterInfo> {
+//     let chapterInfo: ChapterInfo = {
+//       title: '',
+//       href: '',
+//     }
 
-    if (this.rendCtx) {
-      const pub = this.rendCtx.rendition.getPublication();
-      const currentLoc = await this.rendCtx.navigator.getCurrentLocationAsync();
-      let currentChap;
-      if (currentLoc) {
-          const chapterHref = currentLoc.getHref()
-          currentChap = pub.toc.find((item: any) => {
-              return ( chapterHref === item.href);
-          });
+//     if (this.rendCtx) {
+//       const pub = this.rendCtx.rendition.getPublication();
+//       const currentLoc = await this.rendCtx.navigator.getCurrentLocationAsync();
+//       let currentChap;
+//       if (currentLoc) {
+//           const chapterHref = currentLoc.getHref()
+//           currentChap = pub.toc.find((item: any) => {
+//               return ( chapterHref === item.href);
+//           });
 
-          if (!currentChap) {
-              currentChap = pub.toc[0];
-          }
-          chapterInfo.title = currentChap.title;
-          chapterInfo.href = chapterHref;
-      }
-  }
+//           if (!currentChap) {
+//               currentChap = pub.toc[0];
+//           }
+//           chapterInfo.title = currentChap.title;
+//           chapterInfo.href = chapterHref;
+//       }
+//   }
 
-    return chapterInfo;
-  }
+//     return chapterInfo;
+//   }
 
-  public updateFont(font: string): void {
-    let fontFam = '';
-    let fontOverload = '';
-    if (font === 'publisher-font') {
-        fontOverload = 'readium-font-off';
-    }
-    else if (font === 'serif-font') {
-        fontFam = '--RS__modernTf';
-        fontOverload = 'readium-font-on';
-    }
-    else if (font === 'sans-font') {
-        fontFam = '--RS__humanistTf';
-        fontOverload = 'readium-font-on';
-    }
+//   public updateFont(font: string): void {
+//     let fontFam = '';
+//     let fontOverload = '';
+//     if (font === 'publisher-font') {
+//         fontOverload = 'readium-font-off';
+//     }
+//     else if (font === 'serif-font') {
+//         fontFam = '--RS__modernTf';
+//         fontOverload = 'readium-font-on';
+//     }
+//     else if (font === 'sans-font') {
+//         fontFam = '--RS__humanistTf';
+//         fontOverload = 'readium-font-on';
+//     }
 
-    const settings = [{
-        name: SettingName.FontFamily,
-        value: `var(${fontFam})`
-    },
-    {
-        name: SettingName.FontOverride,
-        value: fontOverload
-    }];
+//     const settings = [{
+//         name: SettingName.FontFamily,
+//         value: `var(${fontFam})`
+//     },
+//     {
+//         name: SettingName.FontOverride,
+//         value: fontOverload
+//     }];
 
-    this.rendCtx.rendition.updateViewSettings(settings);
-  }
+//     this.rendCtx.rendition.updateViewSettings(settings);
+//   }
 
-  public updateFontSize(newFontSize: number): void {
-    const fontSettings = [{
-        name: SettingName.FontSize,
-        value: newFontSize * 100,
-    }];
-    this.rendCtx.rendition.updateViewSettings(fontSettings);
-  }
+//   public updateFontSize(newFontSize: number): void {
+//     const fontSettings = [{
+//         name: SettingName.FontSize,
+//         value: newFontSize * 100,
+//     }];
+//     this.rendCtx.rendition.updateViewSettings(fontSettings);
+//   }
 
-  public updateTheme(theme: string): void {
-      let themeSettings = {
-          name: SettingName.ReadingMode,
-          value: '',
-      }
+//   public updateTheme(theme: string): void {
+//       let themeSettings = {
+//           name: SettingName.ReadingMode,
+//           value: '',
+//       }
 
-      if (theme === 'night-theme') {
-          themeSettings.value = 'readium-night-on';
-      }
-      else if (theme === 'sepia-theme') {
-          themeSettings.value = 'readium-sepia-on';
-      }
+//       if (theme === 'night-theme') {
+//           themeSettings.value = 'readium-night-on';
+//       }
+//       else if (theme === 'sepia-theme') {
+//           themeSettings.value = 'readium-sepia-on';
+//       }
 
-      this.rendCtx.rendition.updateViewSettings([themeSettings]);
-  }
+//       this.rendCtx.rendition.updateViewSettings([themeSettings]);
+//   }
 
-  public nextScreen(): void {
-    this.rendCtx.navigator.nextScreen();
-  }
+//   public nextScreen(): void {
+//     this.rendCtx.navigator.nextScreen();
+//   }
 
-  public previousScreen(): void {
-    this.rendCtx.navigator.previousScreen();
-  }
+//   public previousScreen(): void {
+//     this.rendCtx.navigator.previousScreen();
+//   }
 
-  public goToHrefLocation(href: string): void {
-    const pub = this.rendCtx.rendition.getPublication();
-    const relHref = pub.getHrefRelativeToManifest(href);
-    const loc = new Location('', relHref, true);
-    this.rendCtx.navigator.gotoLocation(loc);
-  }
+//   public goToHrefLocation(href: string): void {
+//     const pub = this.rendCtx.rendition.getPublication();
+//     const relHref = pub.getHrefRelativeToManifest(href);
+//     const loc = new Location('', relHref, true);
+//     this.rendCtx.navigator.gotoLocation(loc);
+//   }
 
-  public destroy(): void {
-    if (this.resizer) {
-      this.resizer.stopListenResize();
-    }
-    const el = document.getElementById('layout-view-root');
-    if (el) {
-      el.remove();
-    }
-  }
+//   public destroy(): void {
+//     if (this.resizer) {
+//       this.resizer.stopListenResize();
+//     }
+//     const el = document.getElementById('layout-view-root');
+//     if (el) {
+//       el.remove();
+//     }
+//   }
 
-  public async loadPublication(pubUrl: string, root: HTMLElement): Promise<void> {
-    const publication: Publication = await Publication.fromURL(pubUrl);
-    const loader = new IFrameLoader(publication.getBaseURI());
-    loader.setReadiumCssBasePath('/readerJBKS/readium-css');
-    const cvf = new R2ContentViewFactory(loader);
-    const rendition = new Rendition(publication, root, cvf);
-    rendition.setViewAsVertical(this.viewAsVertical);
-    this.viewportRoot = root;
+//   public async loadPublication(pubUrl: string, root: HTMLElement): Promise<void> {
+//     const publication: Publication = await Publication.fromURL(pubUrl);
+//     const loader = new IFrameLoader(publication.getBaseURI());
+//     loader.setReadiumCssBasePath('/readerJBKS/readium-css');
+//     const cvf = new R2ContentViewFactory(loader);
+//     const rendition = new Rendition(publication, root, cvf);
+//     rendition.setViewAsVertical(this.viewAsVertical);
+//     this.viewportRoot = root;
 
-    this.rendCtx = new R2RenditionContext(rendition, loader);
+//     this.rendCtx = new R2RenditionContext(rendition, loader);
 
-    this.updateSize(false);
+//     this.updateSize(false);
 
-    rendition.setPageLayout({
-        spreadMode: SpreadMode.FitViewportDoubleSpread,
-        pageWidth: 0,
-        pageHeight: 0,
-    });
-    await rendition.render();
-    rendition.viewport.setScrollMode(this.enableScroll ? ScrollMode.Publication : ScrollMode.None);
+//     rendition.setPageLayout({
+//         spreadMode: SpreadMode.FitViewportDoubleSpread,
+//         pageWidth: 0,
+//         pageHeight: 0,
+//     });
+//     await rendition.render();
+//     rendition.viewport.setScrollMode(this.enableScroll ? ScrollMode.Publication : ScrollMode.None);
     
-    this.resizer = new ViewportResizer(this.rendCtx, this.updateSize);
+//     this.resizer = new ViewportResizer(this.rendCtx, this.updateSize);
 
-    await this.rendCtx.navigator.gotoBegin();
-  }
+//     await this.rendCtx.navigator.gotoBegin();
+//   }
 
-  private bindOwnMethods(): void {
-    this.updateFont = this.updateFont.bind(this);
-    this.updateFontSize = this.updateFontSize.bind(this);
-    this.updateSize = this.updateSize.bind(this);
-    this.updateTheme = this.updateTheme.bind(this);
-  }
+//   private bindOwnMethods(): void {
+//     this.updateFont = this.updateFont.bind(this);
+//     this.updateFontSize = this.updateFontSize.bind(this);
+//     this.updateSize = this.updateSize.bind(this);
+//     this.updateTheme = this.updateTheme.bind(this);
+//   }
 
-  private updateSize(willRefreshLayout: boolean = true): void {
-    const availableWidth = this.getAvailableWidth();
-    const availableHeight = this.getAvailableHeight();
+//   private updateSize(willRefreshLayout: boolean = true): void {
+//     const availableWidth = this.getAvailableWidth();
+//     const availableHeight = this.getAvailableHeight();
 
-    this.viewportRoot.style.width = `${availableWidth}px`;
-    this.viewportRoot.style.height = `${availableHeight}px`;
+//     this.viewportRoot.style.width = `${availableWidth}px`;
+//     this.viewportRoot.style.height = `${availableHeight}px`;
 
-    const scrollerWidthAdj = this.enableScroll ? 15 : 0;
-    const viewportWidth = availableWidth - scrollerWidthAdj;
-    const viewportHeight = availableHeight;
+//     const scrollerWidthAdj = this.enableScroll ? 15 : 0;
+//     const viewportWidth = availableWidth - scrollerWidthAdj;
+//     const viewportHeight = availableHeight;
 
-    const viewportSize = this.viewAsVertical ? viewportHeight : viewportWidth;
-    const viewportSize2nd = this.viewAsVertical ? viewportWidth : viewportHeight;
-    this.rendCtx.rendition.viewport.setViewportSize(viewportSize, viewportSize2nd);
-    this.rendCtx.rendition.viewport.setPrefetchSize(Math.ceil(availableWidth * 0.1));
-    if (willRefreshLayout) {
-      this.rendCtx.rendition.refreshPageLayout();
-    }
-  }
+//     const viewportSize = this.viewAsVertical ? viewportHeight : viewportWidth;
+//     const viewportSize2nd = this.viewAsVertical ? viewportWidth : viewportHeight;
+//     this.rendCtx.rendition.viewport.setViewportSize(viewportSize, viewportSize2nd);
+//     this.rendCtx.rendition.viewport.setPrefetchSize(Math.ceil(availableWidth * 0.1));
+//     if (willRefreshLayout) {
+//       this.rendCtx.rendition.refreshPageLayout();
+//     }
+//   }
 
-  // Get available height for iframe container to sit within
-  private getAvailableHeight(): number {
-    const topBar = document.getElementById('top-control-bar');
-    let topHeight = 0;
-    if (topBar) {
-        const topRect = topBar.getBoundingClientRect();
-        topHeight = topRect.height;
-    }
-    const bottomBar = document.getElementById('bottom-control-bar');
-    const bottomBar2 = document.getElementById('bottom-info-bar');
-    let bottomHeight = 0;
-    if (bottomBar) {
-        const bottomRect = bottomBar.getBoundingClientRect();
-        bottomHeight = bottomRect.height;
+//   // Get available height for iframe container to sit within
+//   private getAvailableHeight(): number {
+//     const topBar = document.getElementById('top-control-bar');
+//     let topHeight = 0;
+//     if (topBar) {
+//         const topRect = topBar.getBoundingClientRect();
+//         topHeight = topRect.height;
+//     }
+//     const bottomBar = document.getElementById('bottom-control-bar');
+//     const bottomBar2 = document.getElementById('bottom-info-bar');
+//     let bottomHeight = 0;
+//     if (bottomBar) {
+//         const bottomRect = bottomBar.getBoundingClientRect();
+//         bottomHeight = bottomRect.height;
 
-        if (bottomHeight <= 5 && bottomBar2) {
-          const bottomRect2 = bottomBar2.getBoundingClientRect();
-          bottomHeight = bottomRect2.height;
-        }
-    }
+//         if (bottomHeight <= 5 && bottomBar2) {
+//           const bottomRect2 = bottomBar2.getBoundingClientRect();
+//           bottomHeight = bottomRect2.height;
+//         }
+//     }
 
-    return window.innerHeight - topHeight - bottomHeight;
-  }
+//     return window.innerHeight - topHeight - bottomHeight;
+//   }
 
-  // Get available width for iframe container to sit within
-  private getAvailableWidth(): number {
-      const prevBtn = document.getElementById('prev-page-btn');
-      let prevBtnWidth = 0;
-      if (prevBtn) {
-          const rect = prevBtn.getBoundingClientRect();
-          prevBtnWidth = rect.width;
-      }
-      const nextBtn = document.getElementById('next-page-btn');
-      let nextBtnWidth = 0;
-      if (nextBtn) {
-          const rect = nextBtn.getBoundingClientRect();
-          nextBtnWidth = rect.width;
-      }
+//   // Get available width for iframe container to sit within
+//   private getAvailableWidth(): number {
+//       const prevBtn = document.getElementById('prev-page-btn');
+//       let prevBtnWidth = 0;
+//       if (prevBtn) {
+//           const rect = prevBtn.getBoundingClientRect();
+//           prevBtnWidth = rect.width;
+//       }
+//       const nextBtn = document.getElementById('next-page-btn');
+//       let nextBtnWidth = 0;
+//       if (nextBtn) {
+//           const rect = nextBtn.getBoundingClientRect();
+//           nextBtnWidth = rect.width;
+//       }
 
-      return window.innerWidth - prevBtnWidth - nextBtnWidth;
-  }
-}
+//       return window.innerWidth - prevBtnWidth - nextBtnWidth;
+//   }
+// }
